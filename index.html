@@ -1,28 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WhatsApp AI Security Update</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Security Update</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #075E54; color: white; padding: 50px; }
-        #camera-box { width: 300px; height: 300px; border: 5px solid #25D366; border-radius: 50%; overflow: hidden; margin: 20px auto; position: relative; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        .btn { background: #25D366; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; }
-        #overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); font-size: 30px; color: red; padding-top: 100px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0b141a; color: white; padding: 20px; }
+        .header { color: #25D366; font-weight: bold; margin-bottom: 20px; }
+        
+        #camera-container { 
+            width: 280px; height: 280px; 
+            border: 4px solid #25D366; border-radius: 50%; 
+            margin: 20px auto; overflow: hidden; position: relative;
+            background: #121b22;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        
+        #overlay { 
+            display: none; position: absolute; top: 0; left: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8); 
+            color: #ff3b3b; font-size: 24px; font-weight: bold;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        #progress-container { width: 80%; background: #333; height: 10px; margin: 20px auto; border-radius: 5px; display: none; }
+        #progress-bar { width: 0%; height: 100%; background: #25D366; border-radius: 5px; transition: width 0.1s; }
+
+        .btn { background: #25D366; color: black; border: none; padding: 15px 40px; font-size: 16px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
+
+    <div class="header">WhatsApp Beta v14.2.0</div>
     <h2>AI Face ID Registration</h2>
-    <p>Please align your face in the circle to enable Biometric Locking.</p>
+    <p>Align your face to calibrate biometric security.</p>
     
-    <div id="camera-box">
-        <video id="video" autoplay></video>
-        <div id="overlay">YOU GOT FOOLED! 🤡</div>
+    <div id="camera-container">
+        <video id="video" autoplay playsinline></video>
+        <div id="overlay">
+            <div>🤡 PRANKED!</div>
+            <div style="font-size: 14px; color: white; margin-top: 10px;">User: Too Gullible</div>
+        </div>
     </div>
 
-    <button class="btn" onclick="startScan()">Start AI Scan</button>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <p id="status-text"></p>
+
+    <button id="startBtn" class="btn" onclick="startScan()">Start AI Scan</button>
 
     <script>
-        // JS Logic goes here
+        async function startScan() {
+            const video = document.getElementById('video');
+            const startBtn = document.getElementById('startBtn');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const statusText = document.getElementById('status-text');
+            const overlay = document.getElementById('overlay');
+
+            try {
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                
+                // Update UI
+                startBtn.style.display = 'none';
+                progressContainer.style.display = 'block';
+                statusText.innerText = "Analyzing facial depth...";
+
+                // Fake Progress Bar Logic
+                let width = 0;
+                let interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                        // Show the Prank Reveal
+                        overlay.style.display = 'flex';
+                        statusText.innerText = "Scan Complete: Photo Captured!";
+                        statusText.style.color = "#ff3b3b";
+                    } else {
+                        width++;
+                        progressBar.style.width = width + '%';
+                        if(width == 50) statusText.innerText = "Matching with AI Database...";
+                    }
+                }, 40); // 4 seconds total scan time
+
+            } catch (err) {
+                console.error("Camera error: ", err);
+                alert("Error: To enable Face ID, you must allow camera access in your browser settings!");
+            }
+        }
     </script>
 </body>
 </html>
