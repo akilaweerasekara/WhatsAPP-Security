@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp AI Security Update</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #075E54; color: white; padding: 50px; }
+        #camera-box { width: 300px; height: 300px; border: 5px solid #25D366; border-radius: 50%; overflow: hidden; margin: 20px auto; position: relative; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        .btn { background: #25D366; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; }
+        #overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); font-size: 30px; color: red; padding-top: 100px; }
+    </style>
+</head>
+<body>
+    <h2>AI Face ID Registration</h2>
+    <p>Please align your face in the circle to enable Biometric Locking.</p>
+    
+    <div id="camera-box">
+        <video id="video" autoplay></video>
+        <div id="overlay">YOU GOT FOOLED! 🤡</div>
+    </div>
+
+    <button class="btn" onclick="startScan()">Start AI Scan</button>
+
+    <script>
+        // JS Logic goes here
+    </script>
+</body>
+</html>
