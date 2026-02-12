@@ -3,35 +3,46 @@
 <head>
     <title>Prank Link Generator</title>
     <style>
-        body { font-family: sans-serif; background: #0b141a; color: white; text-align: center; padding: 50px; }
-        input { padding: 15px; width: 80%; border-radius: 5px; border: none; font-size: 18px; margin-bottom: 20px; }
-        .btn { background: #25D366; color: black; padding: 15px 30px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        #result { margin-top: 30px; display: none; background: #121b22; padding: 20px; border-radius: 10px; word-break: break-all; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0b141a; color: white; text-align: center; padding: 50px; }
+        .card { background: #121b22; padding: 30px; border-radius: 15px; display: inline-block; max-width: 90%; }
+        input { padding: 15px; width: 80%; border-radius: 5px; border: 1px solid #25D366; background: #2a3942; color: white; font-size: 18px; margin-bottom: 20px; }
+        .btn { background: #25D366; color: black; padding: 15px 30px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; }
+        #result { margin-top: 30px; display: none; background: #1d2a33; padding: 20px; border-radius: 10px; word-break: break-all; border: 1px dashed #25D366; }
+        #finalLink { color: #25D366; display: block; margin: 15px 0; font-size: 14px; }
     </style>
 </head>
 <body>
-    <h2>🤡 Prank Link Generator</h2>
-    <p>Enter your name to customize the prank:</p>
-    <input type="text" id="jokerName" placeholder="Your Name (e.g. Ghost Rider)">
-    <br>
-    <button class="btn" onclick="generateLink()">Generate Prank Link</button>
+    <div class="card">
+        <h2>🤡 Joker's Panel</h2>
+        <p>Step 1: Enter your name</p>
+        <input type="text" id="jokerName" placeholder="Your Prankster Name...">
+        <br>
+        <button class="btn" onclick="generateLink()">Step 2: Generate Link</button>
 
-    <div id="result">
-        <p>Copy this link and send it to your friend:</p>
-        <b id="finalLink" style="color: #25D366;"></b>
+        <div id="result">
+            <p>Step 3: Copy & Send to Friend on WhatsApp</p>
+            <span id="finalLink"></span>
+            <button class="btn" style="background:#34b7f1" onclick="copyLink()">Copy Link</button>
+        </div>
     </div>
 
     <script>
         function generateLink() {
             const name = document.getElementById('jokerName').value;
-            if(!name) return alert("Enter a name first!");
+            if(!name) { alert("Please enter your name first!"); return; }
             
-            // This grabs the current URL and points it to prank.html
-            const baseUrl = window.location.href.replace('index.html', 'prank.html');
-            const prankUrl = baseUrl + "?joker=" + encodeURIComponent(name);
+            // This gets the folder path automatically
+            let currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+            const prankUrl = currentPath + "/prank.html?joker=" + encodeURIComponent(name);
             
             document.getElementById('result').style.display = 'block';
             document.getElementById('finalLink').innerText = prankUrl;
+        }
+
+        function copyLink() {
+            const text = document.getElementById('finalLink').innerText;
+            navigator.clipboard.writeText(text);
+            alert("Link copied to clipboard!");
         }
     </script>
 </body>
