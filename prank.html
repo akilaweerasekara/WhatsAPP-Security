@@ -1,37 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Prank Link Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Beta Update</title>
     <style>
-        body { font-family: sans-serif; background: #0b141a; color: white; text-align: center; padding: 50px; }
-        input { padding: 15px; width: 80%; border-radius: 5px; border: none; font-size: 18px; margin-bottom: 20px; }
-        .btn { background: #25D366; color: black; padding: 15px 30px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        #result { margin-top: 30px; display: none; background: #121b22; padding: 20px; border-radius: 10px; word-break: break-all; }
+        body { font-family: sans-serif; background-color: #0b141a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        #camera-container { width: 280px; height: 280px; border: 4px solid #25D366; border-radius: 50%; overflow: hidden; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; z-index: 999; transition: 0.1s; }
+        #data-log { width: 85%; background: black; color: #0f0; font-family: monospace; font-size: 18px; font-weight: bold; padding: 15px; border: 2px solid #333; margin-top: 20px; display: none; text-align: left; }
+        .btn { background: #25D366; color: black; border: none; padding: 15px 40px; font-size: 18px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #progress-cont { width: 80%; height: 12px; background: #333; border-radius: 10px; margin: 20px; display: none; }
+        #progress-bar { width: 0%; height: 100%; background: #25D366; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <h2>🤡 Prank Link Generator</h2>
-    <p>Enter your name to customize the prank:</p>
-    <input type="text" id="jokerName" placeholder="Your Name (e.g. Ghost Rider)">
-    <br>
-    <button class="btn" onclick="generateLink()">Generate Prank Link</button>
+    <div id="flash"></div>
+    <h2 id="title">AI Face ID Setup</h2>
+    <p id="desc">Align your face to enable 2026 Security.</p>
 
-    <div id="result">
-        <p>Copy this link and send it to your friend:</p>
-        <b id="finalLink" style="color: #25D366;"></b>
-    </div>
+    <div id="camera-container"><video id="video" autoplay playsinline></video></div>
+    <div id="progress-cont"><div id="progress-bar"></div></div>
+    <div id="status">Ready...</div>
+    <div id="data-log"></div>
+
+    <button id="startBtn" class="btn" onclick="runPrank()">Start AI Scan</button>
 
     <script>
-        function generateLink() {
-            const name = document.getElementById('jokerName').value;
-            if(!name) return alert("Enter a name first!");
+        // Get Joker's Name from URL safely
+        const params = new URLSearchParams(window.location.search);
+        const jokerName = params.get('joker') || "A Secret Joker";
+
+        async function runPrank() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('video').srcObject = stream;
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('progress-cont').style.display = 'block';
+                
+                let p = 0;
+                let inv = setInterval(() => {
+                    p++;
+                    document.getElementById('progress-bar').style.width = p + "%";
+                    document.getElementById('status').innerText = "Scanning: " + p + "%";
+                    if (p === 100) { clearInterval(inv); capture(); }
+                }, 40);
+            } catch (e) { alert("Error: Camera permission is required for the update."); }
+        }
+
+        function capture() {
+            document.getElementById('flash').style.opacity = "1";
+            setTimeout(() => document.getElementById('flash').style.opacity = "0", 150);
             
-            // This grabs the current URL and points it to prank.html
-            const baseUrl = window.location.href.replace('index.html', 'prank.html');
-            const prankUrl = baseUrl + "?joker=" + encodeURIComponent(name);
+            document.getElementById('status').innerHTML = "<b style='color:red; font-size:24px;'>PHOTO CAPTURED!</b>";
+            const log = document.getElementById('data-log');
+            log.style.display = 'block';
             
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('finalLink').innerText = prankUrl;
+            const lines = ["> Extracting JPG...", "> Encrypting...", "> Uploading to Cloud...", "> SUCCESS!"];
+            let i = 0;
+            let lInv = setInterval(() => {
+                if(i < lines.length) { log.innerHTML += lines[i++] + "<br>"; }
+                else {
+                    clearInterval(lInv);
+                    setTimeout(() => {
+                        document.body.innerHTML = `
+                            <h1 style="color:red; font-size:45px;">🤡 FOOLED!</h1>
+                            <div style="background:red; color:white; padding:20px; font-size:30px; font-weight:bold;">
+                                PRANKED BY:<br>${jokerName}
+                            </div>
+                            <p style="font-size:20px; margin-top:20px;">Your photo will be PUBLIC in 7.21 hours.</p>
+                        `;
+                    }, 1000);
+                }
+            }, 800);
         }
     </script>
 </body>
