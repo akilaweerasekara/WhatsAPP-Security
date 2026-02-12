@@ -3,93 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Security Update</title>
+    <title>WhatsApp Beta Security Update</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0b141a; color: white; padding: 20px; }
-        .header { color: #25D366; font-weight: bold; margin-bottom: 20px; }
-        
-        #camera-container { 
-            width: 280px; height: 280px; 
-            border: 4px solid #25D366; border-radius: 50%; 
-            margin: 20px auto; overflow: hidden; position: relative;
+        /* WhatsApp Dark Mode Theme */
+        body { 
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif; 
+            background-color: #0b141a; 
+            color: #e9edef; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden;
+        }
+
+        .header { color: #25D366; font-size: 14px; font-weight: bold; margin-bottom: 10px; }
+        h2 { margin: 10px; font-size: 22px; }
+        p { color: #8696a0; font-size: 14px; padding: 0 30px; text-align: center; }
+
+        /* The "Scanning" Circle */
+        #camera-container {
+            width: 260px; height: 260px;
+            border: 4px solid #25D366;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
             background: #121b22;
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.2);
         }
+
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        
-        #overlay { 
-            display: none; position: absolute; top: 0; left: 0; 
-            width: 100%; height: 100%; background: rgba(0,0,0,0.8); 
-            color: #ff3b3b; font-size: 24px; font-weight: bold;
-            flex-direction: column; justify-content: center; align-items: center;
+
+        /* The Scanners / Overlays */
+        #scan-line {
+            position: absolute; width: 100%; height: 4px;
+            background: #25D366; box-shadow: 0 0 15px #25D366;
+            top: 0; animation: scan 2s infinite linear; display: none;
         }
 
-        #progress-container { width: 80%; background: #333; height: 10px; margin: 20px auto; border-radius: 5px; display: none; }
-        #progress-bar { width: 0%; height: 100%; background: #25D366; border-radius: 5px; transition: width 0.1s; }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
 
-        .btn { background: #25D366; color: black; border: none; padding: 15px 40px; font-size: 16px; border-radius: 30px; cursor: pointer; font-weight: bold; }
-        .btn:active { transform: scale(0.95); }
+        #flash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 999;
+        }
+
+        /* Fake Progress Bar */
+        #progress-cont { width: 250px; height: 8px; background: #333; border-radius: 10px; margin-top: 20px; display: none; }
+        #progress-bar { width: 0%; height: 100%; background: #25D366; border-radius: 10px; transition: 0.1s; }
+
+        /* Prank Reveal Overlay */
+        #prank-overlay {
+            display: none; position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10;
+        }
+
+        .scare-text { color: #ff3b3b; font-size: 30px; font-weight: bold; }
+
+        /* Hacker Log */
+        #data-log {
+            width: 80%; background: black; color: #0f0; font-family: monospace;
+            font-size: 10px; padding: 10px; border: 1px solid #333;
+            margin-top: 15px; text-align: left; display: none;
+        }
+
+        .btn {
+            background: #25D366; color: #0b141a; border: none;
+            padding: 15px 40px; font-size: 16px; border-radius: 30px;
+            font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">WhatsApp Beta v14.2.0</div>
-    <h2>AI Face ID Registration</h2>
-    <p>Align your face to calibrate biometric security.</p>
-    
+    <div id="flash"></div>
+
+    <div class="header">WHATSAPP SECURITY CENTER</div>
+    <h2>AI Face ID Setup</h2>
+    <p>Position your face in the circle to enable 2026 Enhanced Encryption.</p>
+
     <div id="camera-container">
         <video id="video" autoplay playsinline></video>
-        <div id="overlay">
-            <div>🤡 PRANKED!</div>
-            <div style="font-size: 14px; color: white; margin-top: 10px;">User: Too Gullible</div>
+        <div id="scan-line"></div>
+        
+        <div id="prank-overlay">
+            <div class="scare-text">🤡 PRANKED!</div>
+            <p style="color: white;">Your photo has been uploaded to the "Gullible Friends" gallery!</p>
+            <button class="btn" onclick="location.reload()">Try Again?</button>
         </div>
     </div>
 
-    <div id="progress-container">
-        <div id="progress-bar"></div>
-    </div>
-    <p id="status-text"></p>
+    <div id="progress-cont"><div id="progress-bar"></div></div>
+    <div id="status">Ready to scan...</div>
+    <div id="data-log"></div>
 
-    <button id="startBtn" class="btn" onclick="startScan()">Start AI Scan</button>
+    <button id="startBtn" class="btn" onclick="runPrank()">Start AI Scan</button>
 
     <script>
-        async function startScan() {
+        async function runPrank() {
             const video = document.getElementById('video');
             const startBtn = document.getElementById('startBtn');
-            const progressContainer = document.getElementById('progress-container');
-            const progressBar = document.getElementById('progress-bar');
-            const statusText = document.getElementById('status-text');
-            const overlay = document.getElementById('overlay');
+            const status = document.getElementById('status');
+            const progCont = document.getElementById('progress-cont');
+            const progBar = document.getElementById('progress-bar');
+            const scanLine = document.getElementById('scan-line');
+            const dataLog = document.getElementById('data-log');
 
             try {
-                // Request camera access
+                // 1. Request Camera Access
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
-                
-                // Update UI
-                startBtn.style.display = 'none';
-                progressContainer.style.display = 'block';
-                statusText.innerText = "Analyzing facial depth...";
 
-                // Fake Progress Bar Logic
-                let width = 0;
+                // 2. Start Animation
+                startBtn.style.display = 'none';
+                progCont.style.display = 'block';
+                scanLine.style.display = 'block';
+                
+                let progress = 0;
                 let interval = setInterval(() => {
-                    if (width >= 100) {
+                    progress++;
+                    progBar.style.width = progress + "%";
+                    status.innerText = "Analyzing Biometrics: " + progress + "%";
+
+                    if (progress === 100) {
                         clearInterval(interval);
-                        // Show the Prank Reveal
-                        overlay.style.display = 'flex';
-                        statusText.innerText = "Scan Complete: Photo Captured!";
-                        statusText.style.color = "#ff3b3b";
-                    } else {
-                        width++;
-                        progressBar.style.width = width + '%';
-                        if(width == 50) statusText.innerText = "Matching with AI Database...";
+                        captureEffect();
                     }
-                }, 40); // 4 seconds total scan time
+                }, 40);
 
             } catch (err) {
-                console.error("Camera error: ", err);
-                alert("Error: To enable Face ID, you must allow camera access in your browser settings!");
+                alert("ERROR: Camera access is required for AI security verification.");
             }
+        }
+
+        function captureEffect() {
+            const flash = document.getElementById('flash');
+            const status = document.getElementById('status');
+            const dataLog = document.getElementById('data-log');
+            const overlay = document.getElementById('prank-overlay');
+
+            // 1. The Shutter Flash
+            flash.style.opacity = "1";
+            setTimeout(() => flash.style.opacity = "0", 150);
+
+            // 2. The Scare Sequence
+            status.innerHTML = "<b style='color:#ff3b3b'>PHOTO CAPTURED!</b>";
+            dataLog.style.display = 'block';
+            
+            const logs = [
+                "> Extracting Facial Geometry...",
+                "> Connecting to Cloud Database...",
+                "> Syncing with Phone Number...",
+                "> Uploading image_772.png...",
+                "> SHARING TO CONTACTS..."
+            ];
+
+            let i = 0;
+            let logInterval = setInterval(() => {
+                if (i < logs.length) {
+                    dataLog.innerHTML += logs[i] + "<br>";
+                    i++;
+                } else {
+                    clearInterval(logInterval);
+                    // 3. Final Reveal
+                    setTimeout(() => {
+                        overlay.style.display = 'flex';
+                        status.innerText = "Sent Successfully! 😂";
+                    }, 1000);
+                }
+            }, 600);
         }
     </script>
 </body>
